@@ -8,7 +8,16 @@
 
 #include "canard_stm32.h"
 #include "_internal_bxcan.h"
+
+#if defined USE_HAL_DRIVER
+#if defined (STM32F100xB) || defined (STM32F100xE) || defined (STM32F101x6) || \
+    defined (STM32F101xB) || defined (STM32F101xE) || defined (STM32F101xG) || defined (STM32F102x6) || defined (STM32F102xB) || defined (STM32F103x6) || \
+    defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || defined (STM32F105xC) || defined (STM32F107xC)
+#include "stm32f1xx_hal.h"
+#endif
+#else /* USE_HAL_DRIVER */
 #include <unistd.h>
+#endif
 
 
 #if CANARD_STM32_USE_CAN2
@@ -136,7 +145,11 @@ static bool waitMSRINAKBitStateChange(volatile const CanardSTM32CANType* const b
         }
 
         // Sleep 1 millisecond
+        #if defined USE_HAL_DRIVER
+        HAL_Delay(1);
+        #else /* USE_HAL_DRIVER */
         usleep(1000);           // TODO: This function may be missing on some platforms
+        #endif
     }
 
     return false;
